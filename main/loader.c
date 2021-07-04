@@ -1675,6 +1675,26 @@ static unsigned int inspect_module(const struct ast_module *mod)
 	return 0;
 }
 
+fuzz_ptr get_fuzz_function(const char *name)
+{
+	struct ast_module *mod;
+
+	if (ast_strlen_zero(name))
+		return (fuzz_ptr) 0;
+
+	mod = find_resource(name, 1);
+
+	if (mod)
+	{
+		return mod->info->fuzz;
+	}
+	else
+	{
+		return (fuzz_ptr) 0;
+	}
+
+}
+
 static enum ast_module_load_result start_resource(struct ast_module *mod)
 {
 	char tmp[256];
