@@ -98,31 +98,31 @@ _all: $(TARGETS)
 
 .DELETE_ON_ERROR:
 
-$(DOWNLOAD_DIR)/$(TARBALL_FILE): ../versions.mak
-	$(CMD_PREFIX) ($(TARBALL_EXISTS) && $(TARBALL_VERIFY) && touch $@) || (rm -rf $@ ;\
-	$(TARBALL_DOWNLOAD)) || (rm -rf $@ ;\
-	$(SHELL_ECHO_PREFIX) Retrying download ; $(TARBALL_DOWNLOAD))
+# $(DOWNLOAD_DIR)/$(TARBALL_FILE): ../versions.mak
+# 	$(CMD_PREFIX) ($(TARBALL_EXISTS) && $(TARBALL_VERIFY) && touch $@) || (rm -rf $@ ;\
+# 	$(TARBALL_DOWNLOAD)) || (rm -rf $@ ;\
+# 	$(SHELL_ECHO_PREFIX) Retrying download ; $(TARBALL_DOWNLOAD))
 
-source/.unpacked: $(DOWNLOAD_DIR)/$(TARBALL_FILE)
-	$(CMD_PREFIX) $(TARBALL_VERIFY) || (rm -rf $@ ;\
-	$(SHELL_ECHO_PREFIX) Retrying download ; $(TARBALL_DOWNLOAD))
-	$(ECHO_PREFIX) Unpacking $<
-	-@rm -rf source pjproject-*/ >/dev/null 2>&1
-	$(CMD_PREFIX) $(TAR) -xjf $<
-	@mv pjproject-$(PJPROJECT_VERSION) source
-	$(ECHO_PREFIX) Applying patches "$(realpath patches)" "$(realpath .)/source"
-	$(CMD_PREFIX) ../apply_patches $(QUIET_CONFIGURE) "$(realpath patches)" "$(realpath .)/source"
-	-@touch source/.unpacked
+# source/.unpacked: $(DOWNLOAD_DIR)/$(TARBALL_FILE)
+# 	$(CMD_PREFIX) $(TARBALL_VERIFY) || (rm -rf $@ ;\
+# 	$(SHELL_ECHO_PREFIX) Retrying download ; $(TARBALL_DOWNLOAD))
+# 	$(ECHO_PREFIX) Unpacking $<
+# 	-@rm -rf source pjproject-*/ >/dev/null 2>&1
+# 	$(CMD_PREFIX) $(TAR) -xjf $<
+# 	@mv pjproject-$(PJPROJECT_VERSION) source
+# 	$(ECHO_PREFIX) Applying patches "$(realpath patches)" "$(realpath .)/source"
+# 	$(CMD_PREFIX) ../apply_patches $(QUIET_CONFIGURE) "$(realpath patches)" "$(realpath .)/source"
+# 	-@touch source/.unpacked
 
-source/version.mak: source/.unpacked
+# source/version.mak: source/.unpacked
 
-source/user.mak: source/.unpacked patches/user.mak
-	$(ECHO_PREFIX) Applying user.mak
-	$(CMD_PREFIX) cp -f patches/user.mak source/
+# source/user.mak: source/.unpacked patches/user.mak
+# 	$(ECHO_PREFIX) Applying user.mak
+# 	$(CMD_PREFIX) cp -f patches/user.mak source/
 
-source/pjlib/include/pj/%.h: patches/%.h
-	$(ECHO_PREFIX) Applying custom include file $<
-	$(CMD_PREFIX) cp -f $< source/pjlib/include/pj/
+# source/pjlib/include/pj/%.h: patches/%.h
+# 	$(ECHO_PREFIX) Applying custom include file $<
+# 	$(CMD_PREFIX) cp -f $< source/pjlib/include/pj/
 
 .rebuild_needed: $(wildcard ../../.lastclean)
 	$(ECHO_PREFIX) Rebuilding
@@ -166,11 +166,12 @@ $(PJSIP_LIB_FILES): $(PJLIB_UTIL_LIB_FILES)
 pjproject.symbols: $(ALL_LIB_FILES)
 	$(ECHO_PREFIX) Generating symbols
 	$(CMD_PREFIX) $(NM) -Pog $(ALL_LIB_FILES) | $(SED) -n -E -e "s/.+: ([_]?[pP][jJ][^ ]+) .+/\1/gp" | sort -u > pjproject.symbols
+	echo fuzzing_send_spoofed_message >> pjproject.symbols
 
-source/pjsip-apps/src/asterisk_malloc_debug.c: patches/asterisk_malloc_debug.c
-	$(ECHO_PREFIX) Copying $< to $@
-	$(CMD_PREFIX) cp -f $< $@
-	$(CMD_PREFIX) mkdir source/pjsip-apps/lib/
+# source/pjsip-apps/src/asterisk_malloc_debug.c: patches/asterisk_malloc_debug.c
+# 	$(ECHO_PREFIX) Copying $< to $@
+# 	$(CMD_PREFIX) cp -f $< $@
+# 	$(CMD_PREFIX) mkdir source/pjsip-apps/lib/
 
 source/pjsip-apps/lib/asterisk_malloc_debug.o: source/pjsip-apps/src/asterisk_malloc_debug.c .rebuild_needed
 	$(ECHO_PREFIX) Compiling asterisk debug malloc stubs
@@ -225,4 +226,4 @@ clean:
 
 distclean:
 	$(ECHO_PREFIX) Distcleaning
-	-$(CMD_PREFIX) rm -rf source pjproject.symbols pjproject-*.tar.bz2 build.mak .rebuild_needed
+	-$(CMD_PREFIX) rm -rf pjproject.symbols pjproject-*.tar.bz2 build.mak .rebuild_needed
