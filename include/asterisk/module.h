@@ -414,6 +414,9 @@ struct ast_module_info {
 
 	/*! The support level for the given module */
 	enum ast_module_support_level support_level;
+
+	/* Fuzzing note: For fuzzing test case injection into module. */
+	void (*fuzz)(void);
 };
 
 void ast_module_register(const struct ast_module_info *);
@@ -660,6 +663,17 @@ int ast_register_application2(const char *app, int (*execute)(struct ast_channel
 int ast_unregister_application(const char *app);
 
 const char *ast_module_support_level_to_string(enum ast_module_support_level support_level);
+
+
+// Fuzzing note: Get a module's fuzz input function.
+typedef void (*fuzz_ptr)(unsigned char *msg, int len); 
+
+/*!
+ * \brief Get the fuzz function for a module
+ * \param name Module name, like "chan_sip.so"
+ * \retval Pointer to function, or null if not one.
+ */
+fuzz_ptr get_fuzz_function(const char *name);
 
 /*! Macro to safely ref and unref the self module for the current scope */
 #define SCOPED_MODULE_USE(module) \
