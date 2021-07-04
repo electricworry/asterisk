@@ -1,0 +1,3 @@
+[submodule "third-party/pjproject/source"]
+	path = third-party/pjproject/source
+	url = git@github.com:electricworry/pjproject.git
